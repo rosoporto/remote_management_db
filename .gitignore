@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Пакеты
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+*.egg-info/
+MANIFEST
+
+# Виртуальные окружения
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.env
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Pytest
+.cache
+.pytest_cache/
+
+# Модули
+*.pyo
+
+# Логи
+*.log
+
+# Конфигурационные файлы
+*.sqlite3
+*.db
+
+# Другие
+.DS_Store
+temp*
+main*
+*.sqlite3
+*.db
+TODO*
