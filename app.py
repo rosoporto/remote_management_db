@@ -1,8 +1,7 @@
-
-
 from flask import Flask, request, render_template, redirect, url_for, flash
 from scripts.get_token import get_token_env
 from scripts.connect_to_server import RemoteSQLExecutor
+from components.fields import USER_USAGE_FIELDS
 
 
 app = Flask(__name__)
@@ -21,16 +20,7 @@ def index():
         
         if result:
             user_data = result.strip().split('|')
-            user = {
-                'id': user_data[0],
-                'user_id': user_data[1],
-                'username': user_data[2],
-                'is_admin': user_data[3],
-                'is_premium': user_data[4],
-                'is_blocked': user_data[5],
-                'usage_count': user_data[6],
-                'created_at': user_data[7]
-            }
+            user = dict(zip(USER_USAGE_FIELDS, user_data))
             return redirect(url_for('edit_user', user_id=user['user_id']))
         else:
             flash("User not found", "error")
@@ -63,6 +53,7 @@ def edit_user(user_id):
         # Обновляем usage_count
         sql_update = f"UPDATE user_usage SET usage_count = {new_usage_count} WHERE user_id = {user_id};"
         remote_sql_executor.execute(sql_update)
+        flash("User updated successfully", "success")
         return redirect(url_for('index'))
     
     # Получаем данные пользователя
@@ -71,19 +62,11 @@ def edit_user(user_id):
     
     if result:
         user_data = result.strip().split('|')
-        user = {
-            'id': user_data[0],
-            'user_id': user_data[1],
-            'username': user_data[2],
-            'is_admin': user_data[3],
-            'is_premium': user_data[4],
-            'is_blocked': user_data[5],
-            'usage_count': user_data[6],
-            'created_at': user_data[7]
-        }
+        user = dict(zip(USER_USAGE_FIELDS, user_data))
         return render_template('edit_user.html', user=user)
     else:
-        return "User not found", 404
+        flash("User not found", "error")
+        return redirect(url_for('index'), 404)
 
 
 @app.errorhandler(404)
