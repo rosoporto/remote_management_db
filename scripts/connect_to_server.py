@@ -8,12 +8,12 @@ class RemoteSQLExecutor:
     Класс для выполнения SQL-запросов на удаленном сервере через SSH.
     """
     SSH_HOST = get_token_env('SSH_HOST')
-    SSH_PORT = get_token_env('SSH_PORT')
+    SSH_PORT = int(get_token_env('SSH_PORT'))
     SSH_USER = get_token_env('SSH_USER')
-    SSH_KEY_PATH = get_token_env('SSH_KEY_PATH')
+    SSH_KEY_PATH = os.path.expanduser('~/.ssh/id_rsa')
     REMOTE_DB_PATH = get_token_env('REMOTE_DB_PATH')
     
-    def __init__(self, host, port, username, private_key_path, remote_db_path):
+    def __init__(self):
         """
         Инициализация класса для выполнения SQL-запросов на удаленном сервере через SSH.
 
@@ -50,13 +50,15 @@ class RemoteSQLExecutor:
             if error:
                 raise Exception(f"Error executing SQL command: {error}")
             return result
+        except Exception as e:
+            raise Exception(f"SSH or SQL execution failed: {e}")
         finally:
             ssh.close()
 
+
 def main(db_name):
     # Пример использования класса для выполнения SQL-запроса на удаленном сервере
-    remote_sql_executor = RemoteSQLExecutor()
-    
+    remote_sql_executor = RemoteSQLExecutor() 
     # Пример SQL-запроса
     sql_command = f"SELECT * FROM {db_name}"  # Замените на ваш SQL-запрос
     
@@ -69,4 +71,6 @@ def main(db_name):
 
 
 if __name__ == "__main__":
-    main()
+    remote_db_name = get_token_env("REMOTE_DB_NAME")
+    main(remote_db_name)
+
