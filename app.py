@@ -8,6 +8,8 @@ app = Flask(__name__)
 app.secret_key = get_token_env("FLASK_SECRET_KEY")
 remote_sql_executor = RemoteSQLExecutor()
 
+db_name = get_token_env("REMOTE_DB_NAME")
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -15,7 +17,7 @@ def index():
         search_query = request.form['search_query']
         
         # Ищем пользователя по user_id или username
-        sql_query = f"SELECT * FROM user_usage WHERE user_id = '{search_query}' OR username = '{search_query}';"
+        sql_query = f"SELECT * FROM {db_name} WHERE user_id = '{search_query}' OR username = '{search_query}';"
         result = remote_sql_executor.execute(sql_query)
         
         if result:
@@ -32,7 +34,7 @@ def index():
 @app.route('/block/<int:user_id>', methods=['POST'])
 def block_user(user_id):
     # Блокируем пользователя
-    sql_update = f"UPDATE user_usage SET is_blocked = 1 WHERE user_id = {user_id};"
+    sql_update = f"UPDATE {db_name} SET is_blocked = 1 WHERE user_id = {user_id};"
     remote_sql_executor.execute(sql_update)
     return redirect(url_for('index'))
 
@@ -51,13 +53,13 @@ def edit_user(user_id):
         new_usage_count = request.form['usage_count']
         
         # Обновляем usage_count
-        sql_update = f"UPDATE user_usage SET usage_count = {new_usage_count} WHERE user_id = {user_id};"
+        sql_update = f"UPDATE {db_name} SET usage_count = {new_usage_count} WHERE user_id = {user_id};"
         remote_sql_executor.execute(sql_update)
         flash("User updated successfully", "success")
         return redirect(url_for('index'))
     
     # Получаем данные пользователя
-    sql_query = f"SELECT * FROM user_usage WHERE user_id = {user_id};"
+    sql_query = f"SELECT * FROM {db_name} WHERE user_id = {user_id};"
     result = remote_sql_executor.execute(sql_query)
     
     if result:
